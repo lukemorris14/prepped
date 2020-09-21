@@ -18,52 +18,50 @@ const authenticate = (userReq) =>
     }
   });
 
-const signin = (request, response) => {
+const login = (request, response) => {
   const userReq = request.body;
-  authenticate(userReq)
-    .then((isAuthenticated) => {
-      if (isAuthenticated) {
-        let user;
-        findUser(userReq)
-          .then((foundUser) => {
-            user = foundUser;
-            return checkPassword(userReq.password, foundUser);
-          })
-          .then((res) => createToken())
-          .then((token) => updateUserToken(token, user))
-          .then(() => {
-            delete user.password_digest;
-            response.status(200).json(user);
-          })
-          .catch((err) => console.error(err));
-      } else {
-        response.status(404);
-      }
-    })
-    .catch(() => {
+  authenticate(userReq).then((isAuthenticated) => {
+    if (isAuthenticated) {
+      let user;
+      findUser(userReq)
+        .then((foundUser) => {
+          user = foundUser;
+          return checkPassword(userReq.password, foundUser);
+        })
+        .then((res) => createToken())
+        .then((token) => updateUserToken(token, user))
+        .then(() => {
+          delete user.password_digest;
+          response.status(200).json(user);
+        })
+        .catch((err) => console.error(err));
+    } else {
       response.status(404);
-    });
+    }
+  });
 };
 
 const signup = (request, response) => {
   const user = request.body;
-  if (authenticate(user)) {
-    hashPassword(user.password)
-      .then((hashedPassword) => {
-        delete user.password;
-        user.password_digest = hashedPassword;
-      })
-      .then(() => createToken())
-      .then((token) => (user.token = token))
-      .then(() => createUser(user))
-      .then((user) => {
-        delete user.password_digest;
-        response.status(201).json({ user });
-      })
-      .catch((err) => console.error(err));
-  } else {
-    response.status(404);
-  }
+  authenticate(userReq).then((isAuthenticated) => {
+    if (isAuthenticated) {
+      hashPassword(user.password)
+        .then((hashedPassword) => {
+          delete user.password;
+          user.password_digest = hashedPassword;
+        })
+        .then(() => createToken())
+        .then((token) => (user.token = token))
+        .then(() => createUser(user))
+        .then((user) => {
+          delete user.password_digest;
+          response.status(201).json({ user });
+        })
+        .catch((err) => console.error(err));
+    } else {
+      response.status(404);
+    }
+  });
 };
 
 const hashPassword = (password) => {
@@ -125,5 +123,5 @@ const updateUserToken = (token, user) => {
 
 module.exports = {
   signup,
-  signin,
+  login,
 };

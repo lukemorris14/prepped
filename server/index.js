@@ -21,8 +21,7 @@ app.use(function (req, res, next) {
 
 // Routes
 app.post('/signup', User.signup);
-app.post('/signin', User.signin)
-
+app.post('/login', User.login);
 
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}.`);
