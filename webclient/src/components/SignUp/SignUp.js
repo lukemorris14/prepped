@@ -1,39 +1,30 @@
 import React, { useState } from 'react';
-import {
-  Avatar,
-  Button,
-  TextField,
-  FormControlLabel,
-  Checkbox,
-  Grid,
-  Typography,
-} from '@material-ui/core/';
-import { Link } from 'react-router-dom';
+import { Avatar, Button, TextField, Typography } from '@material-ui/core/';
 
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { create } from '../../Api';
 
-import './Login.scss';
+import './SignUp.scss';
 
-export const Login = () => {
+export const SignUp = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   return (
-    <div className="Login">
-      <div className="Login__LeftContainer" />
-      <div className="Login__Container">
-        <Avatar className="Login__Avatar">
+    <div className="SignUp">
+      <div className="SignUp__LeftContainer" />
+      <div className="SignUp__Container">
+        <Avatar className="SignUp__Avatar">
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Register
         </Typography>
         <form
-          className="Login__Form"
+          className="SignUp__Form"
           noValidate
           onSubmit={(evt) => {
-            create('/login', {
+            create('/signup', {
               username,
               password,
             });
@@ -43,7 +34,9 @@ export const Login = () => {
           <TextField
             variant="outlined"
             margin="normal"
+            required
             fullWidth
+            id="username"
             label="Username"
             name="username"
             value={username}
@@ -52,6 +45,7 @@ export const Login = () => {
           <TextField
             variant="outlined"
             margin="normal"
+            required
             fullWidth
             name="password"
             label="Password"
@@ -59,34 +53,18 @@ export const Login = () => {
             value={password}
             onChange={({ target }) => setPassword(target.value)}
           />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             color="primary"
-            className="Login__Submit"
+            className="SignUp__Submit"
           >
-            Sign In
+            Register
           </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link to="/signup" variant="body2">
-                "Don't have an account? Sign Up"
-              </Link>
-            </Grid>
-          </Grid>
         </form>
       </div>
-      <div className="Login__RightContainer" />
+      <div className="SignUp__RightContainer" />
     </div>
   );
 };

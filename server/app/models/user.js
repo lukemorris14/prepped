@@ -20,48 +20,39 @@ const authenticate = (userReq) =>
 
 const login = (request, response) => {
   const userReq = request.body;
-  authenticate(userReq).then((isAuthenticated) => {
-    if (isAuthenticated) {
-      let user;
-      findUser(userReq)
-        .then((foundUser) => {
-          user = foundUser;
-          return checkPassword(userReq.password, foundUser);
-        })
-        .then((res) => createToken())
-        .then((token) => updateUserToken(token, user))
-        .then(() => {
-          delete user.password_digest;
-          response.status(200).json(user);
-        })
-        .catch((err) => console.error(err));
-    } else {
-      response.status(404);
-    }
-  });
+  let user;
+
+  findUser(userReq)
+    .then((foundUser) => {
+      user = foundUser;
+      return checkPassword(userReq.password, foundUser);
+    })
+    .then((res) => createToken())
+    .then((token) => updateUserToken(token, user))
+    .then(() => {
+      delete user.password_digest;
+      response.status(200).json(user);
+    })
+    .catch(({ message }) => {
+      return response.status(401).json({ message });
+    });
 };
 
 const signup = (request, response) => {
   const user = request.body;
-  authenticate(userReq).then((isAuthenticated) => {
-    if (isAuthenticated) {
-      hashPassword(user.password)
-        .then((hashedPassword) => {
-          delete user.password;
-          user.password_digest = hashedPassword;
-        })
-        .then(() => createToken())
-        .then((token) => (user.token = token))
-        .then(() => createUser(user))
-        .then((user) => {
-          delete user.password_digest;
-          response.status(201).json({ user });
-        })
-        .catch((err) => console.error(err));
-    } else {
-      response.status(404);
-    }
-  });
+  hashPassword(user.password)
+    .then((hashedPassword) => {
+      delete user.password;
+      user.password_digest = hashedPassword;
+    })
+    .then(() => createToken())
+    .then((token) => (user.token = token))
+    .then(() => createUser(user))
+    .then((user) => {
+      delete user.password_digest;
+      response.status(201).json({ user });
+    })
+    .catch((err) => response.status(401).json({ err }));
 };
 
 const hashPassword = (password) => {
@@ -91,11 +82,17 @@ const createToken = () => {
   });
 };
 
-// app/models/user.js
 const findUser = (userReq) => {
   return database
     .raw('SELECT * FROM users WHERE username = ?', [userReq.username])
-    .then((data) => data.rows[0]);
+    .then((data) => {
+      if (data.rows.length === 0) {
+        throw Error(
+          'Unable to find user with Username/Password combination provided',
+        );
+      }
+      return data.rows[0];
+    });
 };
 
 const checkPassword = (reqPassword, foundUser) => {
