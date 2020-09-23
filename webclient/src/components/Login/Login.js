@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+
 import {
   Avatar,
   Button,
@@ -8,16 +10,21 @@ import {
   Grid,
   Typography,
 } from '@material-ui/core/';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Link } from 'react-router-dom';
 
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { useAuth } from '../../Auth';
 import { create } from '../../Api';
+
 
 import './Login.scss';
 
 export const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  const { setAuthTokens } = useAuth();
+  const history = useHistory();
 
   return (
     <div className="Login">
@@ -36,6 +43,9 @@ export const Login = () => {
             create('/login', {
               username,
               password,
+            }).then(({ token }) => {
+              setAuthTokens(token);
+              history.push('/dashboard');
             });
             evt.preventDefault();
           }}
@@ -80,7 +90,7 @@ export const Login = () => {
             </Grid>
             <Grid item>
               <Link to="/signup" variant="body2">
-                "Don't have an account? Sign Up"
+                Don't have an account? Sign Up
               </Link>
             </Grid>
           </Grid>

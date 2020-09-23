@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Avatar, Button, TextField, Typography } from '@material-ui/core/';
+import { useHistory } from 'react-router-dom';
 
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import PersonAdd from '@material-ui/icons/PersonAdd';
 import { create } from '../../Api';
 
 import './SignUp.scss';
@@ -9,13 +10,16 @@ import './SignUp.scss';
 export const SignUp = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const history = useHistory();
 
   return (
     <div className="SignUp">
       <div className="SignUp__LeftContainer" />
       <div className="SignUp__Container">
         <Avatar className="SignUp__Avatar">
-          <LockOutlinedIcon />
+          <PersonAdd />
         </Avatar>
         <Typography component="h1" variant="h5">
           Register
@@ -27,6 +31,8 @@ export const SignUp = () => {
             create('/signup', {
               username,
               password,
+            }).then(() => {
+              history.push('/login');
             });
             evt.preventDefault();
           }}
@@ -52,6 +58,22 @@ export const SignUp = () => {
             type="password"
             value={password}
             onChange={({ target }) => setPassword(target.value)}
+          />
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="confirmPassword"
+            label="Confirm Password"
+            type="confirmPassword"
+            value={confirmPassword}
+            error={
+              password !== confirmPassword &&
+              confirmPassword !== '' &&
+              password !== ''
+            }
+            onChange={({ target }) => setConfirmPassword(target.value)}
           />
           <Button
             type="submit"
