@@ -6,8 +6,8 @@ module.exports = {
       host: '127.0.0.1',
       user: 'postgres',
       port: '5432',
-      password: 'wierd1',
-      database: 'prepped',
+      password: '',
+      database: '',
       charset: 'utf8',
     },
     migrations: {
